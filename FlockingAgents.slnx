@@ -21,8 +21,8 @@
   <Project Path="UnityEngine.TestRunner.csproj" />
   <Project Path="Unity.Burst.csproj" />
   <Project Path="Unity.VisualScripting.Flow.Editor.csproj" />
-  <Project Path="Unity.VisualStudio.Editor.csproj" />
   <Project Path="Unity.InputSystem.csproj" />
+  <Project Path="Unity.VisualStudio.Editor.csproj" />
   <Project Path="Unity.Entities.csproj" />
   <Project Path="Unity.Scenes.csproj" />
   <Project Path="Unity.Entities.Editor.csproj" />

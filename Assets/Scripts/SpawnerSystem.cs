@@ -61,6 +61,12 @@ public partial struct SpawnerSystem : ISystem
 
             // AvoidanceData
             state.EntityManager.AddComponent<AvoidanceData>(newEntity);
+            state.EntityManager.SetComponentData(newEntity, new AvoidanceData
+            {
+                avoidancePosition = float3.zero,
+                avoidanceRadius = 10f,
+                avoidanceRadiusSqr = 100f
+            });
 
             // SeparationData
             state.EntityManager.AddComponent<SeparationData>(newEntity);

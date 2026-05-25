@@ -35,6 +35,7 @@ public partial struct FlockingMovementSystem : ISystem
             position += velocity * SystemAPI.Time.DeltaTime;
             localTransform.ValueRW.Position = position;
             movementData.ValueRW.position = position;
+            movementData.ValueRW.velocity = velocity;
             if (math.lengthsq(velocity) > 0f)
             {
                 localTransform.ValueRW.Rotation = quaternion.LookRotationSafe(velocity, math.forward());

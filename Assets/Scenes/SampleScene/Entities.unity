@@ -139,6 +139,14 @@ PrefabInstance:
       propertyPath: MaxSpawnCount
       value: 1000
       objectReference: {fileID: 0}
+    - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
+      propertyPath: behaviors.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
+      propertyPath: 'behaviors.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 6d5dbf63d25df284481271bc0e25a690, type: 2}
     - target: {fileID: 3178061679146865191, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
       propertyPath: m_Name
       value: Spawner

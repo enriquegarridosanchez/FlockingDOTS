@@ -10,9 +10,32 @@ class SpawnerAuthoring : MonoBehaviour
     public float SpawnRate;
     public float SpawnRadius;
     public int MaxSpawnCount;
-    public List<BehaviorPresetConfig> behaviors;
+    //public List<BehaviorPresetConfig> behaviors;
 }
-
+public enum BehaviorType
+{
+    Cohesion,
+    Separation,
+    Avoidance,
+    Containment,
+    Alignment
+}
+public struct BehaviorPresetConfigElement : IBufferElementData
+{
+    public BehaviorType type;
+    public float weight;
+    public float radius;
+}
+public struct SpawnerData : IComponentData
+{
+    public Entity Prefab;
+    public float2 SpawnPosition;
+    public float SpawnRate;
+    public float SpawnRadius;
+    public int MaxSpawnCount;
+    // This field is used only for the multi-threading example.
+    public float NextSpawnTime;
+}
 class SpawnerBaker : Baker<SpawnerAuthoring>
 {
     public override void Bake(SpawnerAuthoring authoring)
@@ -27,16 +50,11 @@ class SpawnerBaker : Baker<SpawnerAuthoring>
             MaxSpawnCount = authoring.MaxSpawnCount,
             NextSpawnTime = 0f
         });
+
+        DynamicBuffer<BehaviorPresetConfigElement> behaviorPresetConfigs = AddBuffer<BehaviorPresetConfigElement>(entity);
+
     }
 }
 
-public struct SpawnerData : IComponentData
-{
-    public Entity Prefab;
-    public float2 SpawnPosition;
-    public float SpawnRate;
-    public float SpawnRadius;
-    public int MaxSpawnCount;
-    // This field is used only for the multi-threading example.
-    public float NextSpawnTime;
-}
+
+
