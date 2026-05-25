@@ -5,7 +5,7 @@ using Unity.Mathematics;
 
 public struct AlignmentData :IComponentData
 {
-
+    public float weight;
 }
 
 [BurstCompile]
@@ -16,7 +16,7 @@ public partial struct AlignmentSystem : ISystem
         foreach (var (movementData, alignmentData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<AlignmentData>>())
         {
             DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);
-            float3 alignment = CalculateAlignment(movementData.ValueRO, buffer, alignmentData.ValueRO);
+            float3 alignment = CalculateAlignment(movementData.ValueRO, buffer, alignmentData.ValueRO) * alignmentData.ValueRO.weight;
             movementData.ValueRW.velocity += alignment * SystemAPI.Time.DeltaTime; ;
         }
     }

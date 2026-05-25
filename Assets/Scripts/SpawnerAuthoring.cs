@@ -10,21 +10,9 @@ class SpawnerAuthoring : MonoBehaviour
     public float SpawnRate;
     public float SpawnRadius;
     public int MaxSpawnCount;
-    //public List<BehaviorPresetConfig> behaviors;
-}
-public enum BehaviorType
-{
-    Cohesion,
-    Separation,
-    Avoidance,
-    Containment,
-    Alignment
-}
-public struct BehaviorPresetConfigElement : IBufferElementData
-{
-    public BehaviorType type;
-    public float weight;
-    public float radius;
+    public float NeighbourRadius;
+    public float MaxSpeed;
+    public float MaxSpeedSqr;
 }
 public struct SpawnerData : IComponentData
 {
@@ -33,6 +21,9 @@ public struct SpawnerData : IComponentData
     public float SpawnRate;
     public float SpawnRadius;
     public int MaxSpawnCount;
+    public float NeighbourRadius;
+    public float MaxSpeed;
+    public float MaxSpeedSqr;
     // This field is used only for the multi-threading example.
     public float NextSpawnTime;
 }
@@ -48,11 +39,11 @@ class SpawnerBaker : Baker<SpawnerAuthoring>
             SpawnRate = authoring.SpawnRate,
             SpawnRadius = authoring.SpawnRadius,
             MaxSpawnCount = authoring.MaxSpawnCount,
+            NeighbourRadius = authoring.NeighbourRadius,
+            MaxSpeed = authoring.MaxSpeed,
+            MaxSpeedSqr = authoring.MaxSpeedSqr,
             NextSpawnTime = 0f
         });
-
-        DynamicBuffer<BehaviorPresetConfigElement> behaviorPresetConfigs = AddBuffer<BehaviorPresetConfigElement>(entity);
-
     }
 }
 

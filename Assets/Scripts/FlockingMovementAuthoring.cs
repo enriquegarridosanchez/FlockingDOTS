@@ -10,6 +10,9 @@ public struct FlockingMovementData : IComponentData
     public int id;
     public float3 position;
     public float3 velocity;
+    public float neighbourRadius;
+    public float maxSpeed;
+    public float maxSpeedSqr;
 }
 public struct NeighbourMovementData : IBufferElementData
 {

@@ -21,13 +21,13 @@ public partial struct FlockingMovementSystem : ISystem
         {
             DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);    
 
-            GetNeighboursInRadius(ref state,movementData.ValueRO, 2f, ref buffer);
+            GetNeighboursInRadius(ref state,movementData.ValueRO, movementData.ValueRO.neighbourRadius, ref buffer);
 
             float3 velocity = movementData.ValueRO.velocity;
 
-            if(math.lengthsq(velocity) > 25f)
+            if(math.lengthsq(velocity) > movementData.ValueRO.maxSpeedSqr)
             {
-                velocity = math.normalizesafe(velocity) * 5f;
+                velocity = math.normalizesafe(velocity) * movementData.ValueRO.maxSpeed;
             }
 
             float3 position = movementData.ValueRO.position;

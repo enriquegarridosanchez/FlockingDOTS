@@ -4,6 +4,7 @@ using Unity.Mathematics;
 
 public struct SeparationData :IComponentData
 {
+    public float weight;
     public float separationRadius;
     public float separationRadiusSqr;
 }
@@ -16,7 +17,7 @@ public partial struct SeparationSystem : ISystem
         foreach (var (movementData, separationData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<SeparationData>>())
         {
             DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);
-            float3 separation = CalculateSeparation(movementData.ValueRO, buffer, separationData.ValueRO);
+            float3 separation = CalculateSeparation(movementData.ValueRO, buffer, separationData.ValueRO) * separationData.ValueRO.weight;
             movementData.ValueRW.velocity += separation;
         }
     }

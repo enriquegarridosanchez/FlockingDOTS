@@ -4,6 +4,7 @@ using Unity.Mathematics;
 
 public struct ContainmentData : IComponentData
 {
+    public float weight;
     public float containmentRadius;
     public float containmentRadiusSqr;
 }
@@ -15,7 +16,7 @@ public partial struct ContaimentSystem : ISystem
     {
         foreach (var (movementData, containmentData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<ContainmentData>>())
         {
-            float3 containment = CalculateContainment(movementData.ValueRO, containmentData.ValueRO);
+            float3 containment = CalculateContainment(movementData.ValueRO, containmentData.ValueRO) * containmentData.ValueRO.weight;
             movementData.ValueRW.velocity += containment * SystemAPI.Time.DeltaTime;
         }
     }

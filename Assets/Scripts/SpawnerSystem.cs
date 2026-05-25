@@ -7,9 +7,6 @@ public partial struct SpawnerSystem : ISystem
 {
     public int spawnedCount;
     private float nextSpawn;
-
-    // The Random struct is from the Unity Mathematics package, which provides types
-    // and functions optimized for Burst.
     private Random random;
 
     public void OnCreate(ref SystemState state)
@@ -50,42 +47,56 @@ public partial struct SpawnerSystem : ISystem
                 entity = newEntity,
                 id = spawnedCount,
                 position = newPosition,
-                velocity = new float3(1,0,0)*10,
+                velocity = new float3(math.normalize(random.NextFloat2() * 2f - 1f), 0f) * spawner.MaxSpeed,
+                maxSpeed = spawner.MaxSpeed,
+                maxSpeedSqr = spawner.MaxSpeed * spawner.MaxSpeed,
+                neighbourRadius = spawner.NeighbourRadius,
                 //velocity = random.NextFloat3() * 2 - 1, //3D movement
             });
 
             state.EntityManager.AddBuffer<NeighbourMovementData>(newEntity);
 
-            // CohesionData
+            // 1.CohesionData
             state.EntityManager.AddComponent<CohesionData>(newEntity);
+            state.EntityManager.SetComponentData(newEntity, new CohesionData
+            {
+                weight = 50f
+            });
 
-            // AvoidanceData
+            // 2.AvoidanceData
             state.EntityManager.AddComponent<AvoidanceData>(newEntity);
             state.EntityManager.SetComponentData(newEntity, new AvoidanceData
             {
+                weight = 99999f,
                 avoidancePosition = float3.zero,
                 avoidanceRadius = 10f,
                 avoidanceRadiusSqr = 100f
             });
 
-            // SeparationData
+            // 3.SeparationData
             state.EntityManager.AddComponent<SeparationData>(newEntity);
             state.EntityManager.SetComponentData(newEntity, new SeparationData
             {
-                separationRadius = 5f,
-                separationRadiusSqr = 5f * 5f
+                weight = 30f,
+                separationRadius = 1f,
+                separationRadiusSqr = 1f
             });
 
-            // ContainmentData
+            // 4.ContainmentData
             state.EntityManager.AddComponent<ContainmentData>(newEntity);
             state.EntityManager.SetComponentData(newEntity, new ContainmentData
             {
-                containmentRadius = 5f,
-                containmentRadiusSqr = 5f * 5f
+                weight = 80f,
+                containmentRadius = 50f,
+                containmentRadiusSqr = 50f * 50f
             });
 
+            // 5.AlignmentData
             state.EntityManager.AddComponent<AlignmentData>(newEntity);
-
+            state.EntityManager.SetComponentData(newEntity, new CohesionData
+            {
+                weight = 20f
+            });
             nextSpawn = (float)SystemAPI.Time.ElapsedTime + spawner.SpawnRate;
 
             ++spawnedCount;
