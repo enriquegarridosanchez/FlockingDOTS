@@ -50,22 +50,35 @@ public partial struct SpawnerSystem : ISystem
                 entity = newEntity,
                 id = spawnedCount,
                 position = newPosition,
-                velocity = new float3(random.NextFloat2() * 2 - 1, 0)
+                velocity = new float3(1,0,0)*10,
                 //velocity = random.NextFloat3() * 2 - 1, //3D movement
             });
 
             state.EntityManager.AddBuffer<NeighbourMovementData>(newEntity);
 
-            //// CohesionData
-            //state.EntityManager.AddComponent<CohesionData>(newEntity);
+            // CohesionData
+            state.EntityManager.AddComponent<CohesionData>(newEntity);
 
-            ////// SeparationData
-            //state.EntityManager.AddComponent<SeparationData>(newEntity);
-            //state.EntityManager.SetComponentData(newEntity, new SeparationData
-            //{
-            //    separationRadius = 5f
-            //});
+            // AvoidanceData
+            state.EntityManager.AddComponent<AvoidanceData>(newEntity);
 
+            // SeparationData
+            state.EntityManager.AddComponent<SeparationData>(newEntity);
+            state.EntityManager.SetComponentData(newEntity, new SeparationData
+            {
+                separationRadius = 5f,
+                separationRadiusSqr = 5f * 5f
+            });
+
+            // ContainmentData
+            state.EntityManager.AddComponent<ContainmentData>(newEntity);
+            state.EntityManager.SetComponentData(newEntity, new ContainmentData
+            {
+                containmentRadius = 5f,
+                containmentRadiusSqr = 5f * 5f
+            });
+
+            state.EntityManager.AddComponent<AlignmentData>(newEntity);
 
             nextSpawn = (float)SystemAPI.Time.ElapsedTime + spawner.SpawnRate;
 

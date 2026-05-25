@@ -1,11 +1,14 @@
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 
 public struct SeparationData :IComponentData
 {
     public float separationRadius;
+    public float separationRadiusSqr;
 }
 
+[BurstCompile]
 public partial struct SeparationSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
@@ -13,8 +16,8 @@ public partial struct SeparationSystem : ISystem
         foreach (var (movementData, separationData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<SeparationData>>())
         {
             DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);
-            float3 cohesion = CalculateSeparation(movementData.ValueRO, buffer, separationData.ValueRO);
-            movementData.ValueRW.velocity += cohesion;
+            float3 separation = CalculateSeparation(movementData.ValueRO, buffer, separationData.ValueRO);
+            movementData.ValueRW.velocity += separation;
         }
     }
 

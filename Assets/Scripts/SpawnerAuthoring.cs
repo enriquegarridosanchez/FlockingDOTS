@@ -10,6 +10,7 @@ class SpawnerAuthoring : MonoBehaviour
     public float SpawnRate;
     public float SpawnRadius;
     public int MaxSpawnCount;
+    public List<BehaviorPresetConfig> behaviors;
 }
 
 class SpawnerBaker : Baker<SpawnerAuthoring>

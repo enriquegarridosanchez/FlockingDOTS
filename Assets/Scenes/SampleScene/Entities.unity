@@ -127,6 +127,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
+      propertyPath: SpawnRate
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
+      propertyPath: SpawnRadius
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
+      propertyPath: MaxSpawnCount
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 3178061679146865191, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
       propertyPath: m_Name
       value: Spawner

@@ -3,7 +3,7 @@ using Unity.Mathematics;
 
 public struct CohesionData :IComponentData
 {
-
+    public float cohesionWeight;
 }
 
 public partial struct CohesionSystem : ISystem
@@ -14,7 +14,7 @@ public partial struct CohesionSystem : ISystem
         {
             DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);
             float3 cohesion = CalculateCohesion(movementData.ValueRO, buffer);
-            movementData.ValueRW.velocity += cohesion;
+            movementData.ValueRW.velocity += cohesion * SystemAPI.Time.DeltaTime;
         }
     }
 

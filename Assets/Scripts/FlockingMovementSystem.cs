@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -13,6 +14,7 @@ public partial struct FlockingMovementSystem : ISystem
         state.RequireForUpdate<FlockingMovementData>();
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         foreach (var (movementData, localTransform) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<LocalTransform>>())
@@ -21,29 +23,13 @@ public partial struct FlockingMovementSystem : ISystem
 
             GetNeighboursInRadius(ref state,movementData.ValueRO, 2f, ref buffer);
 
-            //float3 cohesion     = CalculateCohesion(movementData.ValueRO, buffer);
-            //float3 separation   = CalculateSeparation(movementData.ValueRO, buffer);
-            //float3 alignment    = CalculateAlignment(movementData.ValueRO, buffer);
-            //float3 containment  = 10f * CalculateContainment(movementData.ValueRO, buffer);
-
-            //float3 finalForce = cohesion + separation + alignment + containment;
-
-            //velocity += finalForce * SystemAPI.Time.DeltaTime;
-
-            //if (math.lengthsq(velocity) > 100f)
-            //{
-            //    velocity = math.normalizesafe(velocity) * 10f;
-            //}
-
-            ////APPLY MOVEMENT
-
-            //position += velocity * SystemAPI.Time.DeltaTime;
-            //localTransform.ValueRW.Position = position;
-
-            //movementData.ValueRW.velocity = velocity;
-            //movementData.ValueRW.position = position;
-
             float3 velocity = movementData.ValueRO.velocity;
+
+            if(math.lengthsq(velocity) > 25f)
+            {
+                velocity = math.normalizesafe(velocity) * 5f;
+            }
+
             float3 position = movementData.ValueRO.position;
 
             position += velocity * SystemAPI.Time.DeltaTime;
@@ -56,6 +42,7 @@ public partial struct FlockingMovementSystem : ISystem
         }
     }
 
+    [BurstCompile]
     void GetNeighboursInRadius(ref SystemState state, in FlockingMovementData agent, in float radius, ref DynamicBuffer<NeighbourMovementData> neighbors)
     {
         neighbors.Clear();
@@ -85,78 +72,5 @@ public partial struct FlockingMovementSystem : ISystem
                 neighbors.Add(new NeighbourMovementData(hittedFlockingData));
             }
         }
-    }
-
-    //public float3 CalculateCohesion(FlockingMovementData agent, List<FlockingMovementData> neighbors)
-    //{
-    //    float3 cohesion = float3.zero;
-    //    float3 cohesionPos = agent.position;
- 
-    //    if (neighbors.Count > 0)
-    //    {
-    //        foreach (FlockingMovementData neighbour in neighbors)
-    //        {
-    //            cohesionPos += neighbour.position;
-    //        }
-    //        cohesionPos /= neighbors.Count + 1;
-
-    //        cohesion = cohesionPos - agent.position;
-    //        if (math.lengthsq(cohesion) > 1)
-    //        {
-    //            cohesion = math.normalizesafe(cohesion);
-    //        }
-    //    }
-
-    //    return cohesion;
-    //}
-
-    //public float3 CalculateSeparation(FlockingMovementData agent, List<FlockingMovementData> neighbors)
-    //{
-    //    float3 separation = float3.zero;
-    //    float separationRadius = 3f;
-    //    if (neighbors.Count > 0)
-    //    {
-    //        int closeNeighbors = 0;
-    //        foreach (FlockingMovementData neighbour in neighbors)
-    //        {
-    //            float3 difference = agent.position - neighbour.position;
-    //            if (math.lengthsq(difference) > separationRadius * separationRadius) continue;
-    //            ++closeNeighbors;
-    //            separation += difference;
-    //        }
-    //        if (closeNeighbors > 0)
-    //        {
-    //            separation /= closeNeighbors;
-    //            if (math.lengthsq(separation) > 1)
-    //            {
-    //                separation = math.normalizesafe(separation);
-    //            }
-    //        }
-    //    }
-    //    return separation;
-    //}
-
-    public float3 CalculateAlignment(FlockingMovementData agent, List<FlockingMovementData> neighbors)
-    {
-        float3 alignment = agent.velocity;
-        
-        if (neighbors.Count > 0)
-        {
-            foreach (FlockingMovementData neighbour in neighbors)
-            {
-                alignment += neighbour.velocity;
-            }
-        }
-
-        alignment = math.normalizesafe(alignment);
-
-        return alignment;
-    }
-
-    public float3 CalculateContainment(FlockingMovementData agent, List<FlockingMovementData> neighbors)
-    {
-        float3 containment = (math.lengthsq(agent.position)>100*100) ? math.normalize(-agent.position) : float3.zero;
-
-        return containment;
     }
 }
