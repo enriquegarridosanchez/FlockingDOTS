@@ -21,7 +21,7 @@ public partial struct FlockingMovementSystem : ISystem
         {
             DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);    
 
-            GetNeighboursInRadius(ref state,movementData.ValueRO, movementData.ValueRO.neighbourRadius, ref buffer);
+            //GetNeighboursInRadius(ref state,movementData.ValueRO, movementData.ValueRO.neighbourRadius, ref buffer);
 
             float3 velocity = movementData.ValueRO.velocity;
 

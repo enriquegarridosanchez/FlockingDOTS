@@ -133,7 +133,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
       propertyPath: SpawnRate
-      value: 0.01
+      value: 0.001
       objectReference: {fileID: 0}
     - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
       propertyPath: MaxSpeedSqr
@@ -141,11 +141,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
       propertyPath: SpawnRadius
-      value: 50
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
       propertyPath: MaxSpawnCount
-      value: 200
+      value: 5000
       objectReference: {fileID: 0}
     - target: {fileID: 1641596013233497012, guid: 3c57f9a7122cc5a4ba7f89b3216c0b42, type: 3}
       propertyPath: NeighbourRadius

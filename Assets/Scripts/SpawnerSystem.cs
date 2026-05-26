@@ -47,7 +47,7 @@ public partial struct SpawnerSystem : ISystem
                 entity = newEntity,
                 id = spawnedCount,
                 position = newPosition,
-                velocity = new float3(math.normalize(random.NextFloat2() * 2f - 1f), 0f) * spawner.MaxSpeed,
+                velocity = new float3(math.normalize(random.NextFloat2() * 2f - 1f), 0f),
                 maxSpeed = spawner.MaxSpeed,
                 maxSpeedSqr = spawner.MaxSpeed * spawner.MaxSpeed,
                 neighbourRadius = spawner.NeighbourRadius,
@@ -69,17 +69,17 @@ public partial struct SpawnerSystem : ISystem
             {
                 weight = 99999f,
                 avoidancePosition = float3.zero,
-                avoidanceRadius = 10f,
-                avoidanceRadiusSqr = 100f
+                avoidanceRadius = 30f,
+                avoidanceRadiusSqr = 900f
             });
 
             // 3.SeparationData
             state.EntityManager.AddComponent<SeparationData>(newEntity);
             state.EntityManager.SetComponentData(newEntity, new SeparationData
             {
-                weight = 30f,
-                separationRadius = 1f,
-                separationRadiusSqr = 1f
+                weight = 10f,
+                separationRadius = 0.5f,
+                separationRadiusSqr = 0.25f
             });
 
             // 4.ContainmentData
@@ -87,8 +87,8 @@ public partial struct SpawnerSystem : ISystem
             state.EntityManager.SetComponentData(newEntity, new ContainmentData
             {
                 weight = 80f,
-                containmentRadius = 50f,
-                containmentRadiusSqr = 50f * 50f
+                containmentRadius = 100f,
+                containmentRadiusSqr = 100f * 100f
             });
 
             // 5.AlignmentData
