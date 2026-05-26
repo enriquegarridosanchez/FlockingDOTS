@@ -4,10 +4,10 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[BurstCompile]
 public struct AvoidanceData : IComponentData
 {
     public float weight;
-    public float3 avoidancePosition;
     public float avoidanceRadius;
     public float avoidanceRadiusSqr;
 }
@@ -15,37 +15,46 @@ public struct AvoidanceData : IComponentData
 [BurstCompile]
 public partial struct AvoidanceSystem : ISystem
 {
-    public float3 mousePosition;
-
     public void OnUpdate(ref SystemState state)
     {
         Vector2 mouseScreen = Mouse.current.position.ReadValue();
         Vector3 mouseWorlPos = Camera.main.ScreenToWorldPoint(new Vector3(mouseScreen.x, mouseScreen.y, 0f));
         mouseWorlPos.z = 0;
-
-        bool isPressedLeft  = Mouse.current.leftButton.IsPressed();
+        bool isPressedLeft = Mouse.current.leftButton.IsPressed();
         bool isPressedRight = Mouse.current.rightButton.IsPressed();
 
-        if (isPressedLeft == isPressedRight) return;
-
-        foreach (var (movementData, avoidanceData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<AvoidanceData>>())
+        var job = new ComputeAvoidanceJob
         {
-            avoidanceData.ValueRW.avoidancePosition = mouseWorlPos;
-            float3 avoidance = CalculateAvoidance(movementData.ValueRO, avoidanceData.ValueRO) * avoidanceData.ValueRO.weight;
-            movementData.ValueRW.velocity += avoidance * SystemAPI.Time.DeltaTime;
-        }
+            activeAvoidance = (isPressedLeft != isPressedRight),
+            avoid = isPressedLeft,
+            avoidPos = mouseWorlPos
+        };
+        job.Schedule();
+    }
+}
+
+[BurstCompile]
+public partial struct ComputeAvoidanceJob : IJobEntity
+{
+    public bool activeAvoidance;
+    public bool avoid;
+    public float3 avoidPos;
+    void Execute(in Entity entity, ref FlockingMovementData movementData, DynamicBuffer<NeighbourMovementData> neighbors, in AvoidanceData avoidanceData)
+    {
+        movementData.avoidance = CalculateAvoidance(movementData, neighbors, avoidanceData) * avoidanceData.weight;
     }
 
-    public float3 CalculateAvoidance(FlockingMovementData agent, AvoidanceData avoidanceData)
+    public float3 CalculateAvoidance(FlockingMovementData agent, DynamicBuffer<NeighbourMovementData> _, AvoidanceData avoidanceData)
     {
-        float3 avoidance = agent.position - avoidanceData.avoidancePosition;
+        if(!activeAvoidance){ return float3.zero;}
 
-        bool isPressedLeft = Mouse.current.leftButton.IsPressed();
-        if (!isPressedLeft)
+        float3 avoidance = agent.position - avoidPos;
+
+        if (!avoid)
         {
-            avoidance = avoidanceData.avoidancePosition - agent.position;
+            avoidance = -avoidance;
         }
-       
+
         avoidance.z = 0;
 
         if (math.lengthsq(avoidance) <= avoidanceData.avoidanceRadiusSqr)

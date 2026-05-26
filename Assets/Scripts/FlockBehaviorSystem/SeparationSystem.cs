@@ -14,12 +14,18 @@ public partial struct SeparationSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (movementData, separationData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<SeparationData>>())
-        {
-            DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);
-            float3 separation = CalculateSeparation(movementData.ValueRO, buffer, separationData.ValueRO) * separationData.ValueRO.weight;
-            movementData.ValueRW.velocity += separation;
-        }
+        var job = new ComputeSeparationJob();
+        job.Schedule();
+    }
+}
+
+
+[BurstCompile]
+public partial struct ComputeSeparationJob : IJobEntity
+{
+    void Execute(in Entity entity, ref FlockingMovementData movementData, DynamicBuffer<NeighbourMovementData> neighbors, in SeparationData separationData)
+    {
+        movementData.separation = CalculateSeparation(movementData, neighbors, separationData) * separationData.weight;
     }
 
     public float3 CalculateSeparation(FlockingMovementData agent, DynamicBuffer<NeighbourMovementData> neighbors, SeparationData separationData)

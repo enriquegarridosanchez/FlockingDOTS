@@ -67,8 +67,7 @@ public partial struct SpawnerSystem : ISystem
             state.EntityManager.AddComponent<AvoidanceData>(newEntity);
             state.EntityManager.SetComponentData(newEntity, new AvoidanceData
             {
-                weight = 99999f,
-                avoidancePosition = float3.zero,
+                weight = 80f,
                 avoidanceRadius = 30f,
                 avoidanceRadiusSqr = 900f
             });
@@ -77,7 +76,7 @@ public partial struct SpawnerSystem : ISystem
             state.EntityManager.AddComponent<SeparationData>(newEntity);
             state.EntityManager.SetComponentData(newEntity, new SeparationData
             {
-                weight = 10f,
+                weight = 60f,
                 separationRadius = 0.5f,
                 separationRadiusSqr = 0.25f
             });
@@ -87,15 +86,15 @@ public partial struct SpawnerSystem : ISystem
             state.EntityManager.SetComponentData(newEntity, new ContainmentData
             {
                 weight = 80f,
-                containmentRadius = 100f,
-                containmentRadiusSqr = 100f * 100f
+                containmentRadius = 150f,
+                containmentRadiusSqr = 150f * 150f
             });
 
             // 5.AlignmentData
             state.EntityManager.AddComponent<AlignmentData>(newEntity);
             state.EntityManager.SetComponentData(newEntity, new CohesionData
             {
-                weight = 20f
+                weight = 40f
             });
             nextSpawn = (float)SystemAPI.Time.ElapsedTime + spawner.SpawnRate;
 

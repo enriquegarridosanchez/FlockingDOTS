@@ -11,18 +11,14 @@ public partial struct NeighbourGatheringSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        var physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-
         var job = new FlockingJob
         {
             deltaTime = SystemAPI.Time.DeltaTime,
-            collisionWorld = physicsWorld.CollisionWorld,
-            physicsWorld = physicsWorld.PhysicsWorld,
             hashGrid = SystemAPI.GetSingleton<HashGridSingleton>(),
             flockingMovementLookup = SystemAPI.GetComponentLookup<FlockingMovementData>(true)
         };
 
-        state.Dependency = job.ScheduleParallel(state.Dependency);
+        job.ScheduleParallel(state.Dependency).Complete();
     }
 
     [BurstCompile]
@@ -32,10 +28,6 @@ public partial struct NeighbourGatheringSystem : ISystem
         public float deltaTime;
         [ReadOnly]
         public HashGridSingleton hashGrid;
-        [ReadOnly]
-        public CollisionWorld collisionWorld;
-        [ReadOnly]
-        public PhysicsWorld physicsWorld;
         [ReadOnly]
         public ComponentLookup<FlockingMovementData> flockingMovementLookup;
 
@@ -53,39 +45,12 @@ public partial struct NeighbourGatheringSystem : ISystem
                     var otherData = flockingMovementLookup[other];
                     if (otherData.id == movementData.id) continue;
                     neighbours.Add(new NeighbourMovementData(otherData));
+                    if(neighbours.Capacity >= neighbours.Length) break;
                 }
                 while (hashGrid.grid.TryGetNextValue(
                     out other,
                     ref iterator));
             }
-
-            // Physics -based neighbor detection (commented out for performance reasons, as it can be expensive to perform distance checks for every agent every frame)
-            //NativeList<DistanceHit> hits =
-            //    new NativeList<DistanceHit>(Allocator.Temp);
-
-            //var input = new PointDistanceInput
-            //{
-            //    Position = movementData.position,
-            //    MaxDistance = movementData.neighbourRadius,
-            //    Filter = CollisionFilter.Default
-            //};
-
-            //bool foundAny = collisionWorld.CalculateDistance(input, ref hits);
-
-            //if (foundAny)
-            //{
-            //    foreach (var hit in hits)
-            //    {
-            //        Entity other = physicsWorld.Bodies[hit.RigidBodyIndex].Entity;
-
-            //        if (!flockingMovementLookup.HasComponent(other)) continue;
-            //        var otherData = flockingMovementLookup[other];
-            //        if (otherData.id == movementData.id) continue;
-            //        neighbours.Add(new NeighbourMovementData(otherData));
-            //    }
-            //}
-
-            //hits.Dispose();
         }
     }
 }

@@ -3,7 +3,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 
-[InternalBufferCapacity(16)]
 public struct FlockingMovementData : IComponentData
 {
     public Entity entity;
@@ -13,7 +12,15 @@ public struct FlockingMovementData : IComponentData
     public float neighbourRadius;
     public float maxSpeed;
     public float maxSpeedSqr;
+
+    public float3 cohesion;
+    public float3 alignment;
+    public float3 separation;
+    public float3 avoidance;
+    public float3 containment;
 }
+
+[InternalBufferCapacity(8)]
 public struct NeighbourMovementData : IBufferElementData
 {
     public Entity entity;

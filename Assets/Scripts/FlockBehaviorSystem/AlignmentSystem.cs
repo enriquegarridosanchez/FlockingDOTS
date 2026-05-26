@@ -3,6 +3,7 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 
+[BurstCompile]
 public struct AlignmentData :IComponentData
 {
     public float weight;
@@ -13,12 +14,17 @@ public partial struct AlignmentSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (movementData, alignmentData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<AlignmentData>>())
-        {
-            DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);
-            float3 alignment = CalculateAlignment(movementData.ValueRO, buffer, alignmentData.ValueRO) * alignmentData.ValueRO.weight;
-            movementData.ValueRW.velocity += alignment * SystemAPI.Time.DeltaTime; ;
-        }
+        var job = new ComputeAlignmentJob();
+        job.Schedule();
+    }
+}
+
+[BurstCompile]
+public partial struct ComputeAlignmentJob : IJobEntity
+{
+    void Execute(in Entity entity, ref FlockingMovementData movementData, DynamicBuffer<NeighbourMovementData> neighbors, in AlignmentData alignmentData)
+    {
+        movementData.alignment = CalculateAlignment(movementData, neighbors, alignmentData) * alignmentData.weight;
     }
 
     public float3 CalculateAlignment(FlockingMovementData agent, DynamicBuffer<NeighbourMovementData> neighbors, AlignmentData alignmentData)
@@ -38,3 +44,5 @@ public partial struct AlignmentSystem : ISystem
         return alignment;
     }
 }
+
+

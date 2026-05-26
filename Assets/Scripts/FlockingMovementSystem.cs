@@ -19,26 +19,29 @@ public partial struct FlockingMovementSystem : ISystem
     {
         foreach (var (movementData, localTransform) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<LocalTransform>>())
         {
-            DynamicBuffer<NeighbourMovementData> buffer = state.EntityManager.GetBuffer<NeighbourMovementData>(movementData.ValueRO.entity);    
+            float3 appliedForce = float3.zero;
+            appliedForce += movementData.ValueRO.cohesion;
+            appliedForce += movementData.ValueRO.separation;
+            appliedForce += movementData.ValueRO.containment;
+            appliedForce += movementData.ValueRO.alignment;
+            appliedForce += movementData.ValueRO.avoidance;
 
-            //GetNeighboursInRadius(ref state,movementData.ValueRO, movementData.ValueRO.neighbourRadius, ref buffer);
+            float3 newVelocity = movementData.ValueRO.velocity + appliedForce * SystemAPI.Time.DeltaTime;
 
-            float3 velocity = movementData.ValueRO.velocity;
-
-            if(math.lengthsq(velocity) > movementData.ValueRO.maxSpeedSqr)
+            if (math.lengthsq(newVelocity) > movementData.ValueRO.maxSpeedSqr)
             {
-                velocity = math.normalizesafe(velocity) * movementData.ValueRO.maxSpeed;
+                newVelocity = math.normalizesafe(newVelocity) * movementData.ValueRO.maxSpeed;
             }
 
             float3 position = movementData.ValueRO.position;
 
-            position += velocity * SystemAPI.Time.DeltaTime;
+            position += newVelocity * SystemAPI.Time.DeltaTime;
             localTransform.ValueRW.Position = position;
             movementData.ValueRW.position = position;
-            movementData.ValueRW.velocity = velocity;
-            if (math.lengthsq(velocity) > 0f)
+            movementData.ValueRW.velocity = newVelocity;
+            if (math.lengthsq(newVelocity) > 0f)
             {
-                localTransform.ValueRW.Rotation = quaternion.LookRotationSafe(velocity, math.forward());
+                localTransform.ValueRW.Rotation = quaternion.LookRotationSafe(newVelocity, math.forward());
             }
         }
     }

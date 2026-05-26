@@ -1,7 +1,9 @@
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
+[BurstCompile]
 public struct ContainmentData : IComponentData
 {
     public float weight;
@@ -10,21 +12,26 @@ public struct ContainmentData : IComponentData
 }
 
 [BurstCompile]
-public partial struct ContaimentSystem : ISystem
+public partial struct ContainmentSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var (movementData, containmentData) in SystemAPI.Query<RefRW<FlockingMovementData>, RefRW<ContainmentData>>())
-        {
-            float3 containment = CalculateContainment(movementData.ValueRO, containmentData.ValueRO) * containmentData.ValueRO.weight;
-            movementData.ValueRW.velocity += containment * SystemAPI.Time.DeltaTime;
-        }
+        var job = new ComputeContainmentJob();
+        job.Schedule();
+    }
+}
+
+[BurstCompile]
+public partial struct ComputeContainmentJob : IJobEntity
+{
+    void Execute(in Entity entity, ref FlockingMovementData movementData, DynamicBuffer<NeighbourMovementData> neighbors, in ContainmentData containmentData)
+    {
+        movementData.containment = CalculateContainment(movementData, neighbors, containmentData) * containmentData.weight;
     }
 
-    public float3 CalculateContainment(FlockingMovementData agent, ContainmentData contaimentData)
+    public float3 CalculateContainment(FlockingMovementData agent, DynamicBuffer<NeighbourMovementData> _, ContainmentData contaimentData)
     {
-        float3 containment = (math.lengthsq(agent.position) > contaimentData.containmentRadiusSqr) ? math.normalize(-agent.position) : float3.zero;
-        //float3 containment = math.normalize(-agent.position);
+        float3 containment = (math.lengthsq(agent.position) > contaimentData.containmentRadiusSqr) ? -agent.position : float3.zero;
         return containment;
     }
 }
