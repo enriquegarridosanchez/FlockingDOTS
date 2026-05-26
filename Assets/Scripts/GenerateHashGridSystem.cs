@@ -50,7 +50,6 @@ public partial struct GenerateHashGridSystem : ISystem
 public partial struct GenerateHashGridJob : IJobEntity
 {
     public HashGridSingleton hashGrid;
-    //public NativeParallelMultiHashMap<int, Entity>.ParallelWriter gridWriter;
     void Execute(in Entity entity, in FlockingMovementData movementData)
     {
         int3 cell = HashGridUtils.CalculateCellIndex(movementData.position, hashGrid.cellSize);
