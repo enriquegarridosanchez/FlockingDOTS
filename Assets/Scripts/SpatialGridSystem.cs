@@ -18,6 +18,7 @@ public struct SpatialGridSingleton : IComponentData
 public partial struct GenerateSpatialGridSystem : ISystem
 {
     private NativeParallelMultiHashMap<int, Entity> grid;
+
     public void OnCreate(ref SystemState state)
     {
         // Created grid as a singleton so it can be reutilized by systems
@@ -52,24 +53,25 @@ public partial struct GenerateSpatialGridSystem : ISystem
             grid.Capacity = flockingMovementAmount;
         }
 
-        var job = new GenerateSpatialGridJob { spatialGrid = SystemAPI.GetSingleton<SpatialGridSingleton>() };
-        state.Dependency = job.Schedule(state.Dependency);
+        var job = new GenerateSpatialGridJob { gridSingleton = SystemAPI.GetSingleton<SpatialGridSingleton>() };
+        
+        // TODO: Parallelize this job
+        job.Schedule(state.Dependency).Complete();
     }
 }
 
 [BurstCompile]
 public partial struct GenerateSpatialGridJob : IJobEntity
 {
-    public SpatialGridSingleton spatialGrid;
+    public SpatialGridSingleton gridSingleton;
     
     // We fill the spatialGrid with the hash of the cell of each entity, and the entiy itself
     void Execute(in Entity entity, in FlockingMovementData movementData)
     {
-        int3 cell = SpatialGridUtils.CalculateCellIndex(movementData.position, spatialGrid.cellSize);
+        int3 cell = SpatialGridUtils.CalculateCellIndex(movementData.position, gridSingleton.cellSize);
         int hash = SpatialGridUtils.CalculateCellHash(cell);
-        spatialGrid.grid.Add(hash, entity);
+        gridSingleton.grid.Add(hash, entity);
     }
-
 }
 
 // Utility class to calculate cell index and hash
