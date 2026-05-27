@@ -4,8 +4,14 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
+
 // Spatial Grid System: Basic simple implementation of a data structure (MultiHashMap) holding info of every flocking agent
 // TO DO: Substitute MultiHashMap by an Octree implementation to avoid avoid spending so much memory
+
+
+//========================================================================
+// Grid Singleton Component Data
+//========================================================================
 
 [BurstCompile]
 public struct SpatialGridSingleton : IComponentData
@@ -13,6 +19,10 @@ public struct SpatialGridSingleton : IComponentData
     public float cellSize;
     public NativeParallelMultiHashMap<int, Entity> grid;
 }
+
+//========================================================================
+// Generate Grid System
+//========================================================================
 
 [BurstCompile]
 public partial struct GenerateSpatialGridSystem : ISystem
@@ -60,6 +70,10 @@ public partial struct GenerateSpatialGridSystem : ISystem
     }
 }
 
+//========================================================================
+// Generate Grid Job
+//========================================================================
+
 [BurstCompile]
 public partial struct GenerateSpatialGridJob : IJobEntity
 {
@@ -74,7 +88,10 @@ public partial struct GenerateSpatialGridJob : IJobEntity
     }
 }
 
-// Utility class to calculate cell index and hash
+//========================================================================
+// Utility class: Calculate cell index and hash
+//========================================================================
+
 public static class SpatialGridUtils
 {
 
@@ -94,3 +111,5 @@ public static class SpatialGridUtils
         return CalculateCellHash(CalculateCellIndex(position, cellSize));
     }
 }
+
+//EOF
