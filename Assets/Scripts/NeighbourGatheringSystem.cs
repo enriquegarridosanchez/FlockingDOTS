@@ -11,7 +11,7 @@ public partial struct NeighbourGatheringSystem : ISystem
         var job = new FlockingJob
         {
             deltaTime = SystemAPI.Time.DeltaTime,
-            hashGrid = SystemAPI.GetSingleton<HashGridSingleton>(),
+            spatialGrid = SystemAPI.GetSingleton<SpatialGridSingleton>(),
             flockingMovementLookup = SystemAPI.GetComponentLookup<FlockingMovementData>(true)
         };
 
@@ -24,7 +24,7 @@ public partial struct NeighbourGatheringSystem : ISystem
         [ReadOnly]
         public float deltaTime;
         [ReadOnly]
-        public HashGridSingleton hashGrid;
+        public SpatialGridSingleton spatialGrid;
         [ReadOnly]
         public ComponentLookup<FlockingMovementData> flockingMovementLookup;
 
@@ -33,8 +33,8 @@ public partial struct NeighbourGatheringSystem : ISystem
             ref DynamicBuffer<NeighbourMovementData> neighbours)
         {
             neighbours.Clear();
-            int currentCellHash = HashGridUtils.CalculateCellHash(movementData.position, hashGrid.cellSize);
-            if (hashGrid.grid.TryGetFirstValue(currentCellHash, out Entity other, out var iterator))
+            int currentCellHash = SpatialGridUtils.CalculateCellHash(movementData.position, spatialGrid.cellSize);
+            if (spatialGrid.grid.TryGetFirstValue(currentCellHash, out Entity other, out var iterator))
             {
                 do
                 {
@@ -44,7 +44,7 @@ public partial struct NeighbourGatheringSystem : ISystem
                     neighbours.Add(new NeighbourMovementData(otherData));
                     if(neighbours.Capacity >= neighbours.Length) break;
                 }
-                while (hashGrid.grid.TryGetNextValue(
+                while (spatialGrid.grid.TryGetNextValue(
                     out other,
                     ref iterator));
             }
